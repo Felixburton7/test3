@@ -27,3 +27,55 @@ graph TD
 
     style A fill:#lightblue,stroke:#333,stroke-width:2px
 ```
+```mermaid
+graph LR
+    subgraph "Input Data"
+        IN(["Input Residue Features <br> Temp=320 <br> RelAcc=0.05 <br> ESM=0.90 <br> ..."]);
+    end
+
+    subgraph "Decision Tree Model"
+        A["Root Node <br> N = 2.6M <br> Avg RMSF = 0.90 Å"];
+        B["Child Node 1 <br> (Temp <= 360K) <br> N = 1.5M <br> Avg RMSF = 0.75 Å"];
+        C["Child Node 2 <br> (Temp > 360K) <br> N = 1.1M <br> Avg RMSF = 1.10 Å"];
+        
+        D["Leaf Node <br> (Temp <= 360K & RelAcc < 0.1) <br> Avg RMSF = 0.65 Å"]; 
+        %% Final Prediction for this path %%
+        
+        E["Leaf Node <br> (Temp <= 360K & RelAcc >= 0.1) <br> Avg RMSF = 0.80 Å"]; 
+        %% Example leaf %%
+        
+        F["Leaf Node <br> (Temp > 360K & ESM < 0.8) <br> Avg RMSF = 1.00 Å"]; 
+        %% Example leaf %%
+        
+        G["Leaf Node <br> (Temp > 360K & ESM >= 0.8) <br> Avg RMSF = 1.20 Å"]; 
+        %% Example leaf %%
+
+        %% Tree Structure %%
+        A -- "temperature <= 360 K ?" --> B;
+        A -- "temperature > 360 K ?" --> C;
+        B -- "rel_acc < 0.1 ?" --> D;
+        B -- "rel_acc >= 0.1 ?" --> E;
+        C -- "esm_rmsf < 0.8 ?" --> F;
+        C -- "esm_rmsf >= 0.8 ?" --> G;
+
+        style A fill:#lightblue,stroke:#333,stroke-width:2px
+        style D fill:#lightyellow,stroke:#333,stroke-width:1px
+        style E fill:#lightyellow,stroke:#333,stroke-width:1px
+        style F fill:#lightyellow,stroke:#333,stroke-width:1px
+        style G fill:#lightyellow,stroke:#333,stroke-width:1px
+    end
+
+    subgraph "Output"
+        OUT(["Predicted RMSF = 0.65 Å"]);
+    end
+
+    %% Path Taken by Input Data %%
+    IN --> A;
+    A -- "Path: 320 <= 360? YES" --> B;
+    B -- "Path: 0.05 < 0.1? YES" --> D;
+    D --> OUT;
+
+
+    style IN fill:#lightgreen,stroke:#333,stroke-width:2px
+    style OUT fill:#lightcoral,stroke:#333,stroke-width:2px
+```
